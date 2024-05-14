@@ -1,0 +1,133 @@
+Text
+
+import zmq
+import threading
+
+class TextStream:
+    def __init__(self, broker_ip):
+        self.context = zmq.Context()
+
+        # Sockets PUB/SUB para texto
+        self.text_pub = self.context.socket(zmq.PUB)
+        self.text_pub.connect(f"tcp://{broker_ip}:5558")
+
+        self.text_sub = self.context.socket(zmq.SUB)
+        self.text_sub.connect(f"tcp://{broker_ip}:5558")
+        self.text_sub.setsockopt_string(zmq.SUBSCRIBE, "")
+
+    def send_text(self):
+        while True:
+            message = input("Digite sua mensagem: ")
+            self.text_pub.send_string(message)
+
+    def receive_text(self):
+        while True:
+            message = self.text_sub.recv_string()
+            print(f"Nova mensagem: {message}")
+
+    def start(self):
+        send_thread = threading.Thread(target=self.send_text)
+        receive_thread = threading.Thread(target=self.receive_text)
+        send_thread.start()
+        receive_thread.start()
+
+if __name__ == "__main__":
+    broker_ip = "189.100.68.70"  # Seu endereço IP público
+    text_stream = TextStream(broker_ip=broker_ip)
+    text_stream.start()
+
+Video
+
+import zmq
+import cv2
+import numpy as np
+import threading
+
+class VideoStream:
+    def __init__(self, broker_ip):
+        self.context = zmq.Context()
+
+        # Sockets PUB/SUB para vídeo
+        self.video_pub = self.context.socket(zmq.PUB)
+        self.video_pub.connect(f"tcp://{broker_ip}:5557")
+
+        self.video_sub = self.context.socket(zmq.SUB)
+        self.video_sub.connect(f"tcp://{broker_ip}:5557")
+        self.video_sub.setsockopt_string(zmq.SUBSCRIBE, "")
+
+    def send_video(self):
+        cap = cv2.VideoCapture(0)
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+            _, buffer = cv2.imencode('.jpg', frame)
+            self.video_pub.send(buffer.tobytes())
+
+    def receive_video(self):
+        cv2.namedWindow("Video Stream", cv2.WINDOW_NORMAL)
+        while True:
+            data = self.video_sub.recv()
+            np_array = np.frombuffer(data, np.uint8)
+            frame = cv2.imdecode(np_array, cv2.IMREAD_COLOR)
+            cv2.imshow("Video Stream", frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        cv2.destroyAllWindows()
+
+    def start(self):
+        send_thread = threading.Thread(target=self.send_video)
+        receive_thread = threading.Thread(target=self.receive_video)
+        send_thread.start()
+        receive_thread.start()
+
+if __name__ == "__main__":
+    broker_ip = "189.100.68.70"  # Seu endereço IP público
+    video_stream = VideoStream(broker_ip=broker_ip)
+    video_stream.start()
+
+audio
+
+import zmq
+import sounddevice as sd
+import numpy as np
+import threading
+
+class AudioStream:
+    def __init__(self, broker_ip):
+        self.context = zmq.Context()
+
+        # Sockets PUB/SUB para áudio
+        self.audio_pub = self.context.socket(zmq.PUB)
+        self.audio_pub.connect(f"tcp://{broker_ip}:5556")
+
+        self.audio_sub = self.context.socket(zmq.SUB)
+        self.audio_sub.connect(f"tcp://{broker_ip}:5556")
+        self.audio_sub.setsockopt_string(zmq.SUBSCRIBE, "")
+
+    def send_audio(self):
+        def callback(indata, frames, time, status):
+            self.audio_pub.send(indata.tobytes())
+
+        with sd.InputStream(callback=callback):
+            sd.sleep(int(1e6))
+
+    def receive_audio(self):
+        def callback(outdata, frames, time, status):
+            data = self.audio_sub.recv()
+            outdata[:] = np.frombuffer(data, dtype=np.int16).reshape(frames, -1)
+
+        with sd.OutputStream(callback=callback):
+            sd.sleep(int(1e6))
+
+    def start(self):
+        send_thread = threading.Thread(target=self.send_audio)
+        receive_thread = threading.Thread(target=self.receive_audio)
+        send_thread.start()
+        receive_thread.start()
+
+if __name__ == "__main__":
+    broker_ip = "189.100.68.70"  # Seu endereço IP público
+    audio_stream = AudioStream(broker_ip=broker_ip)
+    audio_stream.start()
+
