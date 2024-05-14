@@ -12,17 +12,17 @@ class VideoConferenceClient:
         self.text_pub = self.context.socket(zmq.PUB)
 
         self.audio_pub.connect(f"tcp://{broker_ip}:5556")
-        self.video_pub.connect(f"tcp://{broker_ip}:5557")
-        self.text_pub.connect(f"tcp://{broker_ip}:5558")
+        self.video_pub.connect(f"tcp://{broker_ip}:5558")
+        self.text_pub.connect(f"tcp://{broker_ip}:5560")
 
         # Sockets SUB para receber dados
         self.audio_sub = self.context.socket(zmq.SUB)
         self.video_sub = self.context.socket(zmq.SUB)
         self.text_sub = self.context.socket(zmq.SUB)
 
-        self.audio_sub.connect(f"tcp://{broker_ip}:5559")
+        self.audio_sub.connect(f"tcp://{broker_ip}:5557")
         self.video_sub.connect(f"tcp://{broker_ip}:5559")
-        self.text_sub.connect(f"tcp://{broker_ip}:5559")
+        self.text_sub.connect(f"tcp://{broker_ip}:5561")
 
         self.audio_sub.setsockopt_string(zmq.SUBSCRIBE, "")
         self.video_sub.setsockopt_string(zmq.SUBSCRIBE, "")
@@ -58,7 +58,7 @@ class VideoConferenceClient:
         threading.Thread(target=self.receive_text).start()
 
 if __name__ == "__main__":
-    broker_ip = "189.100.68.70"  # Use o endereço IP interno para testes locais
+    broker_ip = "192.168.1.102"  # Use o endereço IP interno para testes locais
     client = VideoConferenceClient(broker_ip=broker_ip)
     client.start_receiving()
     # Código adicional para capturar e enviar áudio/vídeo/texto
