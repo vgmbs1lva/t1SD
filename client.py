@@ -58,7 +58,7 @@ class VideoConferenceClient:
         threading.Thread(target=self.receive_text).start()
 
 if __name__ == "__main__":
-    broker_ip = "192.168.1.102"  # Use o endereço IP interno para testes locais
+    broker_ip = "189.100.68.70"  # Use o endereço IP interno para testes locais
     client = VideoConferenceClient(broker_ip=broker_ip)
     client.start_receiving()
     # Código adicional para capturar e enviar áudio/vídeo/texto
