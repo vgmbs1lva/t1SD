@@ -1,0 +1,44 @@
+import zmq
+import logging
+
+# Configurar o logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
+
+def run_broker():
+    context = zmq.Context()
+
+    # Sockets XSUB/XPUB para áudio
+    audio_xsub = context.socket(zmq.XSUB)
+    audio_xsub.bind("tcp://*:5556")
+    audio_xpub = context.socket(zmq.XPUB)
+    audio_xpub.bind("tcp://*:5557")
+
+    # Sockets XSUB/XPUB para vídeo
+    video_xsub = context.socket(zmq.XSUB)
+    video_xsub.bind("tcp://*:5558")
+    video_xpub = context.socket(zmq.XPUB)
+    video_xpub.bind("tcp://*:5559")
+
+    # Sockets XSUB/XPUB para texto
+    text_xsub = context.socket(zmq.XSUB)
+    text_xsub.bind("tcp://*:5560")
+    text_xpub = context.socket(zmq.XPUB)
+    text_xpub.bind("tcp://*:5561")
+
+    logging.info("Broker iniciado e aguardando mensagens...")
+
+    # Iniciar proxies
+    zmq.proxy(audio_xsub, audio_xpub)
+    zmq.proxy(video_xsub, video_xpub)
+    zmq.proxy(text_xsub, text_xpub)
+
+    audio_xsub.close()
+    audio_xpub.close()
+    video_xsub.close()
+    video_xpub.close()
+    text_xsub.close()
+    text_xpub.close()
+    context.term()
+
+if __name__ == "__main__":
+    run_broker()
