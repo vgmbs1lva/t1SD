@@ -1,0 +1,42 @@
+import zmq
+import sounddevice as sd
+import numpy as np
+import threading
+
+class AudioStream:
+    def __init__(self, broker_ip):
+        self.context = zmq.Context()
+
+        # Sockets PUB/SUB para áudio
+        self.audio_pub = self.context.socket(zmq.PUB)
+        self.audio_pub.connect(f"tcp://{broker_ip}:5556")
+
+        self.audio_sub = self.context.socket(zmq.SUB)
+        self.audio_sub.connect(f"tcp://{broker_ip}:5556")
+        self.audio_sub.setsockopt_string(zmq.SUBSCRIBE, "")
+
+    def send_audio(self):
+        def callback(indata, frames, time, status):
+            self.audio_pub.send(indata.tobytes())
+
+        with sd.InputStream(callback=callback):
+            sd.sleep(int(1e6))
+
+    def receive_audio(self):
+        def callback(outdata, frames, time, status):
+            data = self.audio_sub.recv()
+            outdata[:] = np.frombuffer(data, dtype=np.int16).reshape(frames, -1)
+
+        with sd.OutputStream(callback=callback):
+            sd.sleep(int(1e6))
+
+    def start(self):
+        send_thread = threading.Thread(target=self.send_audio)
+        receive_thread = threading.Thread(target=self.receive_audio)
+        send_thread.start()
+        receive_thread.start()
+
+if __name__ == "__main__":
+    broker_ip = "189.100.68.70"  # Seu endereço IP público
+    audio_stream = AudioStream(broker_ip=broker_ip)
+    audio_stream.start()
