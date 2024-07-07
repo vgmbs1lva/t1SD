@@ -2,41 +2,37 @@ import zmq
 import threading
 import time
 
-class TextStream:
-    def __init__(self, broker_ip):
-        self.context = zmq.Context()
+def receive_messages(socket):
+    while True:
+        try:
+            message = socket.recv_string()
+            print(f"Recebido: {message}")
+        except Exception as e:
+            print(f"Erro ao receber mensagem: {e}")
 
-        # Sockets PUB para enviar dados de texto
-        self.text_pub = self.context.socket(zmq.PUB)
-        self.text_pub.connect(f"tcp://{broker_ip}:5560")
+def client():
+    context = zmq.Context()
 
-        # Sockets SUB para receber dados de texto
-        self.text_sub = self.context.socket(zmq.SUB)
-        self.text_sub.connect(f"tcp://{broker_ip}:5561")
-        self.text_sub.setsockopt_string(zmq.SUBSCRIBE, "")
+    # Socket para enviar mensagens (PUB)
+    publisher = context.socket(zmq.PUB)
+    publisher.connect("tcp://localhost:5560")
 
-    def send_text(self):
-        while True:
-            message = input("Digite sua mensagem: ")
-            print(f"Enviando mensagem: {message}")
-            self.text_pub.send_string(message)
-            time.sleep(0.1)  # Pequena pausa para garantir que a mensagem seja publicada
+    # Socket para receber mensagens (SUB)
+    subscriber = context.socket(zmq.SUB)
+    subscriber.connect("tcp://localhost:5557")
+    subscriber.setsockopt_string(zmq.SUBSCRIBE, "")
 
-    def receive_text(self):
-        while True:
-            try:
-                message = self.text_sub.recv_string(flags=zmq.NOBLOCK)
-                print(f"Nova mensagem recebida: {message}")
-            except zmq.Again:
-                time.sleep(0.1)
+    threading.Thread(target=receive_messages, args=(subscriber,)).start()
 
-    def start(self):
-        send_thread = threading.Thread(target=self.send_text)
-        receive_thread = threading.Thread(target=self.receive_text)
-        send_thread.start()
-        receive_thread.start()
+    print("Cliente conectado. Pronto para enviar mensagens.")
+    
+    # Esperar um pouco antes de começar a enviar mensagens para garantir que a conexão está estabelecida
+    time.sleep(1)
+    
+    while True:
+        message = input("Digite sua mensagem: ")
+        publisher.send_string(message)
+        print(f"Mensagem enviada: {message}")
 
 if __name__ == "__main__":
-    broker_ip = "189.100.68.70"  # Use o endereço IP interno para testes locais
-    text_stream = TextStream(broker_ip=broker_ip)
-    text_stream.start()
+    client()
