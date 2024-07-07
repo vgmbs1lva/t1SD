@@ -1,44 +1,35 @@
 import zmq
-import logging
+import threading
 
-# Configurar o logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
-
-def run_broker():
+def broker():
     context = zmq.Context()
 
-    # Sockets XSUB/XPUB para áudio
-    audio_xsub = context.socket(zmq.XSUB)
-    audio_xsub.bind("tcp://*:5556")
-    audio_xpub = context.socket(zmq.XPUB)
-    audio_xpub.bind("tcp://*:5557")
+    # Criar sockets para texto
+    text_frontend = context.socket(zmq.XSUB)
+    text_backend = context.socket(zmq.XPUB)
+    text_frontend.bind("tcp://*:5560")
+    text_backend.bind("tcp://*:5557")
 
-    # Sockets XSUB/XPUB para vídeo
-    video_xsub = context.socket(zmq.XSUB)
-    video_xsub.bind("tcp://*:5558")
-    video_xpub = context.socket(zmq.XPUB)
-    video_xpub.bind("tcp://*:5559")
+    # Criar sockets para áudio
+    audio_frontend = context.socket(zmq.XSUB)
+    audio_backend = context.socket(zmq.XPUB)
+    audio_frontend.bind("tcp://*:5561")
+    audio_backend.bind("tcp://*:5558")
 
-    # Sockets XSUB/XPUB para texto
-    text_xsub = context.socket(zmq.XSUB)
-    text_xsub.bind("tcp://*:5560")
-    text_xpub = context.socket(zmq.XPUB)
-    text_xpub.bind("tcp://*:5561")
+    # Criar sockets para vídeo
+    video_frontend = context.socket(zmq.XSUB)
+    video_backend = context.socket(zmq.XPUB)
+    video_frontend.bind("tcp://*:5562")
+    video_backend.bind("tcp://*:5559")
 
-    logging.info("Broker iniciado e aguardando mensagens...")
+    print("Broker de mensagens iniciado.")
 
-    # Iniciar proxies
-    zmq.proxy(audio_xsub, audio_xpub)
-    zmq.proxy(video_xsub, video_xpub)
-    zmq.proxy(text_xsub, text_xpub)
+    def proxy(frontend, backend):
+        zmq.proxy(frontend, backend)
 
-    audio_xsub.close()
-    audio_xpub.close()
-    video_xsub.close()
-    video_xpub.close()
-    text_xsub.close()
-    text_xpub.close()
-    context.term()
+    threading.Thread(target=proxy, args=(text_frontend, text_backend)).start()
+    threading.Thread(target=proxy, args=(audio_frontend, audio_backend)).start()
+    threading.Thread(target=proxy, args=(video_frontend, video_backend)).start()
 
 if __name__ == "__main__":
-    run_broker()
+    broker()
