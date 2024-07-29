@@ -24,8 +24,10 @@ git clone https://github.com/MatheusRMVideira/compiladores-trabalho-2.git
 cd compiladores-trabalho-2
 mvn install
 mvn compile assembly:single
+```
 
 Para executar o código
+
 
 java -jar ./target/compiladorT5-1.0-SNAPSHOT-jar-with-dependencies.jar {ARQUIVO DE ENTRADA} {ARQUIVO DE SAÍDA}
 
