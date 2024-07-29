@@ -1,6 +1,8 @@
 # Trabalho 3, 4 e 5 de Compiladores 2024/1
 
-**Atenção**: Importante ressaltar que o trabalho que será entregue no T3 é o mesmo do T5. Como adiantamos o T5, e os casos de teste funcionam no T3 e T4, utilizaremos o mesmo nesses trabalhos. Por conta disso, verá implementações referentes ao T4 e T5 nas linhas de código, como também nas classes e funções.
+**Atenção**: 
+Importante destacar que o trabalho entregue no T3 será o mesmo a ser entregue no T5. Como antecipamos o T5 e os casos de teste são válidos para o T3 e T4, utilizaremos o mesmo trabalho para essas etapas. Por essa razão, você encontrará implementações relacionadas ao T4 e T5 no código, incluindo nas classes e funções.
+  
 
 ### Grupo:
 - Matheus Rezende Milani Videira - 790809
@@ -21,8 +23,8 @@ Para realizar o trabalho foram utilizados os seguintes programas:
 Execute os comandos abaixo no terminal de comandos:
 
 ```sh
-git clone https://github.com/MatheusRMVideira/compiladores-trabalho-2.git
-cd compiladores-trabalho-2
+git clone https://github.com/MatheusRMVideira/compiladores-t3.git
+cd compiladores-trabalho-3
 mvn install
 mvn compile assembly:single
 ```
@@ -37,6 +39,3 @@ SE ATENTE A USAR OS DIRETÓRIOS DE SUA PRÓPRIA MÁQUINA, E OS NOMES DOS ARQUIVO
 
 VERIFIQUE O <maven.compiler.source> E </maven.compiler.target> NO ARQUIVO POM DE SEU PROGRAMA, O ARQUIVO BASE CONSTA COMO 22.
 
-Para compilar o código em um arquivo à parte, abra o projeto na IDE NetBeans, utilize a função de "Clean and Build" localizada no canto superior esquerdo. Se o arquivo fonte for modificado, se atente a erros e warnings, pois eles podem comprometer o funcionamento da aplicação.
-
-Bom Proveito!
