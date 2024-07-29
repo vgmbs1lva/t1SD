@@ -12,9 +12,10 @@ Para realizar o trabalho foram utilizados os seguintes programas:
 
 | Nome do programa | Versão | Link para download |
 |------------------|--------|--------------------|
-| NetBeans | 12.6 | [Windows](https://www.apache.org/dyn/closer.cgi/netbeans/netbeans-installers/12.6/Apache-NetBeans-12.6-bin-windows-x64.exe) \| [Linux](https://www.apache.org/dyn/closer.cgi/netbeans/netbeans-installers/12.6/Apache-NetBeans-12.6-bin-linux-x64.sh) \| [Mac](https://www.apache.org/dyn/closer.cgi/netbeans/netbeans-installers/12.6/Apache-NetBeans-12.6-bin-macosx.dmg) |
-| Apache Maven | 3.8.4 | [https://maven.apache.org/](https://maven.apache.org/) |
-| antlr4 | Usado para criação de dicionários | [https://www.antlr.org/](https://www.antlr.org/) |
+| IntelliJ IDEA | 2024.1 (Ultimate Edition) | [https://www.jetbrains.com/pt-br/idea/download/?section=windows](https://www.jetbrains.com/pt-br/idea/download/?section=windows) |
+| Apache Maven | 3.9.6 | [https://archive.apache.org/dist/maven/maven-3/3.9.6/](https://archive.apache.org/dist/maven/maven-3/3.9.6/) |
+| OpenJDK | 22.0.1 | [https://jdk.java.net/22/](https://jdk.java.net/22/) |
+| antlr4 | 4.7.2 | Instalado via Maven |
 
 ### Para compilar o projeto:
 Execute os comandos abaixo no terminal de comandos:
@@ -28,12 +29,13 @@ mvn compile assembly:single
 
 Para executar o código
 
-
+```sh
 java -jar ./target/compiladorT5-1.0-SNAPSHOT-jar-with-dependencies.jar {ARQUIVO DE ENTRADA} {ARQUIVO DE SAÍDA}
+```
 
 SE ATENTE A USAR OS DIRETÓRIOS DE SUA PRÓPRIA MÁQUINA, E OS NOMES DOS ARQUIVOS DE ENTRADA E SAÍDA DESEJADOS.
 
-VERIFIQUE O <maven.compiler.source> E </maven.compiler.target> NO ARQUIVO POM DE SEU PROGRAMA, O ARQUIVO BASE CONSTA COMO 1.8.
+VERIFIQUE O <maven.compiler.source> E </maven.compiler.target> NO ARQUIVO POM DE SEU PROGRAMA, O ARQUIVO BASE CONSTA COMO 22.
 
 Para compilar o código em um arquivo à parte, abra o projeto na IDE NetBeans, utilize a função de "Clean and Build" localizada no canto superior esquerdo. Se o arquivo fonte for modificado, se atente a erros e warnings, pois eles podem comprometer o funcionamento da aplicação.
 
